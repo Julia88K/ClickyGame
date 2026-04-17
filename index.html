@@ -26,8 +26,15 @@
 
   <!-- Add your site or application content here -->
   <h1> ClickyGame </h1>
+  <p id = "timer"> Timer: 10 </p>
   <button id = "button1" > Click me! </button>
   <p id = "scoreDisplay"> 0 </p>
+
+  <div id="nameSection" style="display: none;">
+    <p>Game over! Enter your name:</p>
+    <input type="text" id="nameInput" placeholder="Your name..." />
+    <button onclick="submitName()">Submit</button>
+  </div>
   <script src="js/app.js"></script>
 
 </body>
