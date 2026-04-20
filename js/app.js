@@ -11,18 +11,19 @@ let gameFinished = false;
 let interval = null;
 
 // HTML DOM
-
 const button = document.getElementById("button1")
 const scoreDisplay = document.getElementById("scoreDisplay")
 const timerDisplay = document.getElementById("timer")
 const nameSection = document.getElementById("nameSection");
+const button2 = document.getElementById("button2")
 
 // UI Functions & Events
 button.addEventListener("click", (e) => {
   handleClick();
 })
-
-
+button2.addEventListener("click", (e) => {
+  newGame();
+})
 
 // Functions
 function increaseScore() {
@@ -59,7 +60,7 @@ function endGame() {
   }
 
   function resetGame() {
-    timeLeft = 60;
+    timeLeft = 10;
     score = 0;
     gameStarted = false;
     gameFinished = false;
@@ -67,6 +68,44 @@ function endGame() {
     interval = null;
     timerDisplay.innerText = '10';
     scoreDisplay.innerText = '0';
+    button.style.display = "block";
     button.disabled = false;
+    nameSection.style.display = "none";
   }
 
+async function submitHighScore() {
+  const name = document.getElementById("nameInput").value;
+  const response = await fetch("https://hooks.zapier.com/hooks/catch/8338993/ujs9jj9/", {
+    method: "POST",
+    body: JSON.stringify({name: name, score: score}),
+  });
+  console.log(response);
+}
+
+const newGame = async () => {
+  await submitHighScore();
+  await getScoreBoardData();
+  resetGame();
+}
+
+function getScoreBoardData() {
+    const url = "https://script.google.com/macros/s/AKfycbys5aEPMvNCutyhNYYCcQcCjzsi2UtqNspmKyCH-AicJxJbCJMrAoT0LUaYaXhTWA8n/exec";
+
+    const scoreboard = document.getElementById("scoreBoard");
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log('Scoreboard data:', data);
+        scoreboard.innerHTML = "";
+        scoreboard.style.display = "block";
+        data.sort((a, b) => b.score - a.score)
+        data.forEach((player, index) => {
+          const row = document.createElement("p");
+          row.innerText = `Row ${index + 1}: Name=${player.name}, Score=${player.score}`;
+          scoreboard.appendChild(row)
+        });
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+      });
+  }
