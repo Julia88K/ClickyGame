@@ -1,6 +1,6 @@
 
 // Click a button or object to earn points so that I can increase my score.
-// See my current
+// See my current score
 // See a countdown timer so that I know how much time is left
 
 // Variables
@@ -97,7 +97,6 @@ const newGame = async () => {
   await submitHighScore();
   await new Promise(resolve => setTimeout(resolve, 2000));
   await getScoreBoardData();
-  button3.style.display = "block";
 }
 
 function getScoreBoardData() {
