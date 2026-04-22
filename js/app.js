@@ -4,7 +4,7 @@
 // See a countdown timer so that I know how much time is left
 
 // Variables
-let timeLeft = 10;
+let timeLeft = 60;
 let score = 0;
 let gameStarted = false;
 let gameFinished = false;
@@ -16,6 +16,9 @@ const scoreDisplay = document.getElementById("scoreDisplay")
 const timerDisplay = document.getElementById("timer")
 const nameSection = document.getElementById("nameSection");
 const button2 = document.getElementById("button2")
+const scoreboard = document.getElementById("scoreBoard")
+const message = document.getElementById("statusMessage")
+const button3 = document.getElementById("button3")
 
 // UI Functions & Events
 button.addEventListener("click", (e) => {
@@ -23,6 +26,10 @@ button.addEventListener("click", (e) => {
 })
 button2.addEventListener("click", (e) => {
   newGame();
+})
+
+button3.addEventListener("click", () => {
+  resetGame();
 })
 
 // Functions
@@ -60,17 +67,20 @@ function endGame() {
   }
 
   function resetGame() {
-    timeLeft = 10;
+    timeLeft = 60;
     score = 0;
     gameStarted = false;
     gameFinished = false;
     clearInterval(interval);
     interval = null;
-    timerDisplay.innerText = '10';
+    timerDisplay.innerText = '60';
     scoreDisplay.innerText = '0';
     button.style.display = "block";
     button.disabled = false;
     nameSection.style.display = "none";
+    button3.style.display = "none";
+    message.style.display = "none";
+    scoreboard.style.display = "none";
   }
 
 async function submitHighScore() {
@@ -79,29 +89,34 @@ async function submitHighScore() {
     method: "POST",
     body: JSON.stringify({name: name, score: score}),
   });
+  document.getElementById("statusMessage").style.display = "block";
   console.log(response);
 }
 
 const newGame = async () => {
   await submitHighScore();
+  await new Promise(resolve => setTimeout(resolve, 2000));
   await getScoreBoardData();
-  resetGame();
+  button3.style.display = "block";
 }
 
 function getScoreBoardData() {
     const url = "https://script.google.com/macros/s/AKfycbys5aEPMvNCutyhNYYCcQcCjzsi2UtqNspmKyCH-AicJxJbCJMrAoT0LUaYaXhTWA8n/exec";
 
-    const scoreboard = document.getElementById("scoreBoard");
     fetch(url)
       .then(response => response.json())
       .then(data => {
         console.log('Scoreboard data:', data);
         scoreboard.innerHTML = "";
         scoreboard.style.display = "block";
-        data.sort((a, b) => b.score - a.score)
-        data.forEach((player, index) => {
+        button3.style.display = "block";
+
+        data
+          .sort((a, b) => Number(b.score) - Number(a.score))
+          .slice (0,10)
+          .forEach((player, index) => {
           const row = document.createElement("p");
-          row.innerText = `Row ${index + 1}: Name=${player.name}, Score=${player.score}`;
+          row.innerText = `Row ${index + 1}: Name: ${player.name}, Score: ${player.score}`;
           scoreboard.appendChild(row)
         });
       })
